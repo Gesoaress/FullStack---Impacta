@@ -1,7 +1,9 @@
 import os
 from flask_sqlalchemy import SQLAlchemy
+from flask_jwt_extended import JWTManager
 
 db = SQLAlchemy()
+jwt = JWTManager()
 
 def init_db(app):
     """
@@ -13,20 +15,18 @@ def init_db(app):
     """
     
     # ========== OPÇÃO 1: SQLite (Sem Docker) ==========
-    # Banco de dados local, arquivo criado na pasta do projeto
     basedir = os.path.abspath(os.path.dirname(__file__))
     db_path = os.path.join(basedir, '..', '..', 'market_management.db')
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
     
     # ========== OPÇÃO 2: MySQL (Com Docker) ==========
-    # Descomente a linha abaixo e comente a linha do SQLite acima
-    # Depois rode: docker-compose up
     # app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root@mysql57:3306/market_management'
     
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'chave-secreta-padrao')
+
     db.init_app(app)
+    jwt.init_app(app)
     
-    # Cria as tabelas automaticamente
     with app.app_context():
         db.create_all()
-
