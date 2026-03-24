@@ -1,16 +1,19 @@
 from twilio.rest import Client
-
+import random
 import os
-
-account_sid = os.getenv("TWILIO_ACCOUNT_SID")
-auth_token = os.getenv("TWILIO_AUTH_TOKEN")
-client = Client(account_sid, auth_token)
-
-message = client.messages.create(
-  from_='whatsapp:+14155238886',
-  content_sid='HXb5b62575e6e4ff6129ad7c8efe1f983e',
-  content_variables='{"1":"12/1","2":"3pm"}',
-  to='whatsapp:+5511946810472'
-)
-
-print(message.sid)
+ 
+ACCOUNT_SID = "seu_account_sid_aqui"
+AUTH_TOKEN = "seu_auth_token_aqui"
+WHATSAPP_NUMBER = "whatsapp:+14155238886"  
+ 
+def generate_code():
+    return str(random.randint(1000, 9999))  
+ 
+def send_whatsapp_code(phone, code):
+    client = Client(ACCOUNT_SID, AUTH_TOKEN)
+    message = client.messages.create(
+        body=f"Seu código de ativação é: {code}",
+        from_=WHATSAPP_NUMBER,
+        to=f"whatsapp:{phone}"
+    )
+    return message.sid
