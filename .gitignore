@@ -17,3 +17,5 @@ env/
 
 # OS
 .DS_Store
+.env
+.db/

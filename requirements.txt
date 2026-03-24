@@ -1,8 +1,8 @@
-Python 3.14.0
-
 Flask>=3.0
-Flask-SQLALchemy>=3.1
+Flask-SQLAlchemy>=3.1
 Werkzeug>=3.0
-SQLALchemy>=2.0
-
-flask --app run run
+SQLAlchemy>=2.0
+twilio
+python-dotenv
+twilio
+flask-jwt-extended

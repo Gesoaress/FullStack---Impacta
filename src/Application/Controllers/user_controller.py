@@ -13,11 +13,36 @@ class UserController:
         password = data.get('password')
 
         if not name or not cnpj or not email or not phone or not password:
-            return make_response(jsonify({"erro": "Missing required fields"}), 400)
+            return make_response(jsonify({"erro": "Campos obrigatórios faltando"}), 400)
 
-        user = UserService.create_user(name, cnpj, email, phone, password)
+        try:
+            user = UserService.create_user(name, cnpj, email, phone, password)
+            return make_response(jsonify({
+                "mensagem": "Mini mercado cadastrado com sucesso",
+                "usuario": user.to_dict()
+            }), 201)
+        except ValueError as e:
+            return make_response(jsonify({"erro": str(e)}), 409)
+        except Exception as e:
+            return make_response(jsonify({"erro": "Erro interno no servidor"}), 500)
 
-        return make_response(jsonify({
-            "mensagem": "Mini mercado cadastrado com sucesso",
-            "usuario": user.to_dict()
-        }), 201)
+    @staticmethod
+    def activate_user():
+        data = request.get_json()
+
+        phone = data.get('phone')
+        code = data.get('code')
+
+        if not phone or not code:
+            return make_response(jsonify({"erro": "Campos obrigatórios faltando"}), 400)
+
+        try:
+            user = UserService.activate_user(phone, code)
+            return make_response(jsonify({
+                "mensagem": "Mini mercado ativado com sucesso",
+                "usuario": user.to_dict()
+            }), 200)
+        except ValueError as e:
+            return make_response(jsonify({"erro": str(e)}), 400)
+        except Exception as e:
+            return make_response(jsonify({"erro": "Erro interno no servidor"}), 500)
