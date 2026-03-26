@@ -20,3 +20,15 @@ def init_routes(app):
     @app.route('/api/auth/login', methods=['POST'])
     def login():
         return AuthController.login()
+
+    @app.route('/api/sellers/<int:user_id>', methods=['GET'])
+    def get_user(user_id):
+        return UserController.get_user(user_id)
+
+    @app.route('/api/sellers/<int:user_id>', methods=['PUT'])
+    def update_user(user_id):
+        return UserController.update_user(user_id)
+
+    @app.route('/api/sellers/<int:user_id>/inactivate', methods=['PATCH'])
+    def inactivate_user(user_id):
+        return UserController.inactivate_user(user_id)

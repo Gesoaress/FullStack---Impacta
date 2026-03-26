@@ -7,14 +7,12 @@ class UserService:
     @staticmethod
     def create_user(name, cnpj, email, phone, password):
 
-        # Verifica duplicidade antes de tentar salvar
         if User.query.filter_by(email=email).first():
             raise ValueError("E-mail já cadastrado")
 
         if User.query.filter_by(cnpj=cnpj).first():
             raise ValueError("CNPJ já cadastrado")
 
-        # Gera o código de ativação
         code = generate_code()
 
         user = User(
@@ -30,7 +28,6 @@ class UserService:
         db.session.add(user)
         db.session.commit()
 
-        # Envia o código via WhatsApp
         send_whatsapp_code(phone, code)
 
         return UserDomain(
@@ -45,7 +42,6 @@ class UserService:
 
     @staticmethod
     def activate_user(phone, code):
-        # Busca o seller pelo celular
         user = User.query.filter_by(phone=phone).first()
 
         if not user:
@@ -57,9 +53,79 @@ class UserService:
         if user.status == "ACTIVE":
             raise ValueError("Seller já está ativo")
 
-        # Ativa o seller
         user.status = "ACTIVE"
-        user.activation_code = None  # limpa o código após ativar
+        user.activation_code = None
+        db.session.commit()
+
+        return UserDomain(
+            id=user.id,
+            name=user.name,
+            cnpj=user.cnpj,
+            email=user.email,
+            phone=user.phone,
+            password=user.password,
+            status=user.status
+        )
+
+    @staticmethod
+    def get_user(user_id):
+        user = User.query.get(user_id)
+
+        if not user:
+            raise ValueError("Seller não encontrado")
+
+        return UserDomain(
+            id=user.id,
+            name=user.name,
+            cnpj=user.cnpj,
+            email=user.email,
+            phone=user.phone,
+            password=user.password,
+            status=user.status
+        )
+
+    @staticmethod
+    def update_user(user_id, name=None, email=None, phone=None, password=None):
+        user = User.query.get(user_id)
+
+        if not user:
+            raise ValueError("Seller não encontrado")
+
+        # Atualiza só os campos que vieram
+        if name:
+            user.name = name
+        if email:
+            if User.query.filter_by(email=email).first():
+                raise ValueError("E-mail já cadastrado")
+            user.email = email
+        if phone:
+            user.phone = phone
+        if password:
+            user.set_password(password)
+
+        db.session.commit()
+
+        return UserDomain(
+            id=user.id,
+            name=user.name,
+            cnpj=user.cnpj,
+            email=user.email,
+            phone=user.phone,
+            password=user.password,
+            status=user.status
+        )
+
+    @staticmethod
+    def inactivate_user(user_id):
+        user = User.query.get(user_id)
+
+        if not user:
+            raise ValueError("Seller não encontrado")
+
+        if user.status == "INACTIVE":
+            raise ValueError("Seller já está inativo")
+
+        user.status = "INACTIVE"
         db.session.commit()
 
         return UserDomain(
