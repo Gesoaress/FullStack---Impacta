@@ -130,7 +130,7 @@ Um seller autenticado pode:
 ---
 
 ## 🛠️ Tecnologias Utilizadas
-- **Back-end:** Kotlin + Spring Boot
+- **Back-end:** Python+ Spring Boot
 - **Front-end:** React.js
 - **Banco de Dados:** MySQL ou PostgreSQL
 - **Autenticação:** JWT ou OAuth
