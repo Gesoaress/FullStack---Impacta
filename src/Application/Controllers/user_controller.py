@@ -1,106 +1,57 @@
-from flask import request, jsonify, make_response
-from flask_jwt_extended import jwt_required, get_jwt_identity
-from src.Application.Service.user_service import UserService
+from src.Application.Controllers.user_controller import UserController
+from src.Application.Controllers.auth_controller import AuthController
+from src.Application.Controllers.product_controller import ProductController
+from flask import jsonify, make_response
 
-class UserController:
-    @staticmethod
+def init_routes(app):
+    @app.route('/api', methods=['GET'])
+    def health():
+        return make_response(jsonify({
+            "mensagem": "API - OK; Docker - Up",
+        }), 200)
+
+    # Sellers
+    @app.route('/api/sellers', methods=['POST'])
     def register_user():
-        data = request.get_json()
+        return UserController.register_user()
 
-        name = data.get('name')
-        cnpj = data.get('cnpj')
-        email = data.get('email')
-        phone = data.get('phone')
-        password = data.get('password')
-
-        if not name or not cnpj or not email or not phone or not password:
-            return make_response(jsonify({"erro": "Campos obrigatórios faltando"}), 400)
-
-        try:
-            user = UserService.create_user(name, cnpj, email, phone, password)
-            return make_response(jsonify({
-                "mensagem": "Mini mercado cadastrado com sucesso",
-                "usuario": user.to_dict()
-            }), 201)
-        except ValueError as e:
-            return make_response(jsonify({"erro": str(e)}), 409)
-        except Exception as e:
-            return make_response(jsonify({"erro": "Erro interno no servidor"}), 500)
-
-    @staticmethod
+    @app.route('/api/sellers/activate', methods=['POST'])
     def activate_user():
-        data = request.get_json()
+        return UserController.activate_user()
 
-        phone = data.get('phone')
-        code = data.get('code')
+    @app.route('/api/auth/login', methods=['POST'])
+    def login():
+        return AuthController.login()
 
-        if not phone or not code:
-            return make_response(jsonify({"erro": "Campos obrigatórios faltando"}), 400)
-
-        try:
-            user = UserService.activate_user(phone, code)
-            return make_response(jsonify({
-                "mensagem": "Mini mercado ativado com sucesso",
-                "usuario": user.to_dict()
-            }), 200)
-        except ValueError as e:
-            return make_response(jsonify({"erro": str(e)}), 400)
-        except Exception as e:
-            return make_response(jsonify({"erro": "Erro interno no servidor"}), 500)
-
-    @staticmethod
-    @jwt_required()
+    @app.route('/api/sellers/<int:user_id>', methods=['GET'])
     def get_user(user_id):
-        try:
-            user = UserService.get_user(user_id)
-            return make_response(jsonify({
-                "usuario": user.to_dict()
-            }), 200)
-        except ValueError as e:
-            return make_response(jsonify({"erro": str(e)}), 404)
-        except Exception as e:
-            return make_response(jsonify({"erro": "Erro interno no servidor"}), 500)
+        return UserController.get_user(user_id)
 
-    @staticmethod
-    @jwt_required()
+    @app.route('/api/sellers/<int:user_id>', methods=['PUT'])
     def update_user(user_id):
-        # Garante que só o próprio seller pode editar seus dados
-        current_user_id = get_jwt_identity()
-        if str(user_id) != str(current_user_id):
-            return make_response(jsonify({"erro": "Sem permissão para editar outro seller"}), 403)
+        return UserController.update_user(user_id)
 
-        data = request.get_json()
-        name = data.get('name')
-        email = data.get('email')
-        phone = data.get('phone')
-        password = data.get('password')
-
-        try:
-            user = UserService.update_user(user_id, name, email, phone, password)
-            return make_response(jsonify({
-                "mensagem": "Seller atualizado com sucesso",
-                "usuario": user.to_dict()
-            }), 200)
-        except ValueError as e:
-            return make_response(jsonify({"erro": str(e)}), 400)
-        except Exception as e:
-            return make_response(jsonify({"erro": "Erro interno no servidor"}), 500)
-
-    @staticmethod
-    @jwt_required()
+    @app.route('/api/sellers/<int:user_id>/inactivate', methods=['PATCH'])
     def inactivate_user(user_id):
-        # Garante que só o próprio seller pode se inativar
-        current_user_id = get_jwt_identity()
-        if str(user_id) != str(current_user_id):
-            return make_response(jsonify({"erro": "Sem permissão para inativar outro seller"}), 403)
+        return UserController.inactivate_user(user_id)
 
-        try:
-            user = UserService.inactivate_user(user_id)
-            return make_response(jsonify({
-                "mensagem": "Seller inativado com sucesso",
-                "usuario": user.to_dict()
-            }), 200)
-        except ValueError as e:
-            return make_response(jsonify({"erro": str(e)}), 400)
-        except Exception as e:
-            return make_response(jsonify({"erro": "Erro interno no servidor"}), 500)
+    # Products
+    @app.route('/api/products', methods=['POST'])
+    def create_product():
+        return ProductController.create_product()
+
+    @app.route('/api/products', methods=['GET'])
+    def list_products():
+        return ProductController.list_products()
+
+    @app.route('/api/products/<int:product_id>', methods=['GET'])
+    def get_product(product_id):
+        return ProductController.get_product(product_id)
+
+    @app.route('/api/products/<int:product_id>', methods=['PUT'])
+    def update_product(product_id):
+        return ProductController.update_product(product_id)
+
+    @app.route('/api/products/<int:product_id>/inactivate', methods=['PATCH'])
+    def inactivate_product(product_id):
+        return ProductController.inactivate_product(product_id)
