@@ -12,14 +12,14 @@ class ProductController:
 
         name = data.get('name')
         price = data.get('price')
-        stock_quantity = data.get('stock_quantity')
+        quantity = data.get('quantity')
         image = data.get('image')
 
-        if not name or price is None or stock_quantity is None:
+        if not name or price is None or quantity is None:
             return make_response(jsonify({"erro": "Campos obrigatórios faltando"}), 400)
 
         try:
-            product = ProductService.create_product(name, price, stock_quantity, image, seller_id)
+            product = ProductService.create_product(seller_id, name, price, quantity, image)
             return make_response(jsonify({
                 "mensagem": "Produto cadastrado com sucesso",
                 "produto": product.to_dict()
@@ -48,7 +48,7 @@ class ProductController:
         seller_id = get_jwt_identity()
 
         try:
-            product = ProductService.get_product(product_id, seller_id)
+            product = ProductService.get_product(seller_id, product_id)
             return make_response(jsonify({
                 "produto": product.to_dict()
             }), 200)
@@ -65,11 +65,11 @@ class ProductController:
 
         name = data.get('name')
         price = data.get('price')
-        stock_quantity = data.get('stock_quantity')
+        quantity = data.get('quantity')
         image = data.get('image')
 
         try:
-            product = ProductService.update_product(product_id, seller_id, name, price, stock_quantity, image)
+            product = ProductService.update_product(seller_id, product_id, name, price, quantity, image)
             return make_response(jsonify({
                 "mensagem": "Produto atualizado com sucesso",
                 "produto": product.to_dict()
