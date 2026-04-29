@@ -14,7 +14,7 @@ export default function LoginPage() {
 
   const handle = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
 
-    const submit = async () => {
+/*     const submit = async () => {
     if (!form.email || !form.senha) { setError('Preencha e-mail e senha.'); return; }
     setError(''); setLoading(true);
     try {
@@ -26,8 +26,8 @@ export default function LoginPage() {
     } finally {
       setLoading(false);
     }
-  };
-  /*
+  }; */
+  
   const submit = async () => {
     if (!form.email || !form.senha) { setError('Preencha e-mail e senha.'); return; }
     setError(''); setLoading(true);
@@ -42,7 +42,7 @@ export default function LoginPage() {
     }
   };
 
-  */
+  
   return (
     <div className="auth-page">
       <WinWindow title="Login" icon="🔐" className="auth-win">
