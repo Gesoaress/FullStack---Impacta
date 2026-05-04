@@ -1,1 +1,0 @@
-from src.Application.Controllers.sale_controller import SaleController
