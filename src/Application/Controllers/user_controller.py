@@ -1,57 +1,96 @@
-from src.Application.Controllers.user_controller import UserController
-from src.Application.Controllers.auth_controller import AuthController
-from src.Application.Controllers.product_controller import ProductController
-from flask import jsonify, make_response
+from flask import request, jsonify, make_response
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from src.Application.Service.user_service import UserService
 
-def init_routes(app):
-    @app.route('/api', methods=['GET'])
-    def health():
-        return make_response(jsonify({
-            "mensagem": "API - OK; Docker - Up",
-        }), 200)
+class UserController:
 
-    # Sellers
-    @app.route('/api/sellers', methods=['POST'])
+    @staticmethod
     def register_user():
-        return UserController.register_user()
+        data = request.get_json()
+        name = data.get('name')
+        cnpj = data.get('cnpj')
+        email = data.get('email')
+        phone = data.get('phone')
+        password = data.get('password')
 
-    @app.route('/api/sellers/activate', methods=['POST'])
+        if not name or not cnpj or not email or not phone or not password:
+            return make_response(jsonify({"erro": "Campos obrigatórios faltando"}), 400)
+
+        try:
+            user = UserService.create_user(name, cnpj, email, phone, password)
+            return make_response(jsonify({
+                "mensagem": "Mini mercado cadastrado com sucesso",
+                "usuario": user.to_dict()
+            }), 201)
+        except ValueError as e:
+            return make_response(jsonify({"erro": str(e)}), 409)
+        except Exception as e:
+            return make_response(jsonify({"erro": "Erro interno no servidor"}), 500)
+
+    @staticmethod
     def activate_user():
-        return UserController.activate_user()
+        data = request.get_json()
+        phone = data.get('phone')
+        code = data.get('code')
 
-    @app.route('/api/auth/login', methods=['POST'])
-    def login():
-        return AuthController.login()
+        if not phone or not code:
+            return make_response(jsonify({"erro": "Campos obrigatórios faltando"}), 400)
 
-    @app.route('/api/sellers/<int:user_id>', methods=['GET'])
+        try:
+            user = UserService.activate_user(phone, code)
+            return make_response(jsonify({
+                "mensagem": "Mini mercado ativado com sucesso",
+                "usuario": user.to_dict()
+            }), 200)
+        except ValueError as e:
+            return make_response(jsonify({"erro": str(e)}), 400)
+        except Exception as e:
+            return make_response(jsonify({"erro": "Erro interno no servidor"}), 500)
+
+    @staticmethod
+    @jwt_required()
     def get_user(user_id):
-        return UserController.get_user(user_id)
+        try:
+            user = UserService.get_user(user_id)
+            return make_response(jsonify({
+                "usuario": user.to_dict()
+            }), 200)
+        except ValueError as e:
+            return make_response(jsonify({"erro": str(e)}), 404)
+        except Exception as e:
+            return make_response(jsonify({"erro": "Erro interno no servidor"}), 500)
 
-    @app.route('/api/sellers/<int:user_id>', methods=['PUT'])
+    @staticmethod
+    @jwt_required()
     def update_user(user_id):
-        return UserController.update_user(user_id)
+        data = request.get_json()
+        try:
+            user = UserService.update_user(
+                user_id,
+                name=data.get('name'),
+                email=data.get('email'),
+                phone=data.get('phone'),
+                password=data.get('password')
+            )
+            return make_response(jsonify({
+                "mensagem": "Seller atualizado com sucesso",
+                "usuario": user.to_dict()
+            }), 200)
+        except ValueError as e:
+            return make_response(jsonify({"erro": str(e)}), 400)
+        except Exception as e:
+            return make_response(jsonify({"erro": "Erro interno no servidor"}), 500)
 
-    @app.route('/api/sellers/<int:user_id>/inactivate', methods=['PATCH'])
+    @staticmethod
+    @jwt_required()
     def inactivate_user(user_id):
-        return UserController.inactivate_user(user_id)
-
-    # Products
-    @app.route('/api/products', methods=['POST'])
-    def create_product():
-        return ProductController.create_product()
-
-    @app.route('/api/products', methods=['GET'])
-    def list_products():
-        return ProductController.list_products()
-
-    @app.route('/api/products/<int:product_id>', methods=['GET'])
-    def get_product(product_id):
-        return ProductController.get_product(product_id)
-
-    @app.route('/api/products/<int:product_id>', methods=['PUT'])
-    def update_product(product_id):
-        return ProductController.update_product(product_id)
-
-    @app.route('/api/products/<int:product_id>/inactivate', methods=['PATCH'])
-    def inactivate_product(product_id):
-        return ProductController.inactivate_product(product_id)
+        try:
+            user = UserService.inactivate_user(user_id)
+            return make_response(jsonify({
+                "mensagem": "Seller inativado com sucesso",
+                "usuario": user.to_dict()
+            }), 200)
+        except ValueError as e:
+            return make_response(jsonify({"erro": str(e)}), 400)
+        except Exception as e:
+            return make_response(jsonify({"erro": "Erro interno no servidor"}), 500)

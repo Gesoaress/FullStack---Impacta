@@ -1,8 +1,0 @@
-Flask>=3.0
-Flask-SQLAlchemy>=3.1
-Werkzeug>=3.0
-SQLAlchemy>=2.0
-twilio
-python-dotenv
-twilio
-flask-jwt-extended
