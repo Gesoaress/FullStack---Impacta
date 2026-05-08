@@ -19,3 +19,6 @@ env/
 .DS_Store
 .env
 .db/
+
+# Frontend (repositório separado)
+frontend/
