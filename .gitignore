@@ -19,3 +19,7 @@ env/
 .DS_Store
 .env
 .db/
+
+# Repositórios separados
+frontend/
+FullStack---Impacta/
