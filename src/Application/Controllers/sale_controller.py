@@ -6,20 +6,19 @@ class SaleController:
 
     @staticmethod
     @jwt_required()
-    def create_sale():
+    def create_order():
         seller_id = get_jwt_identity()
         data = request.get_json()
-        product_id = data.get('product_id')
-        quantidade = data.get('quantity')
+        items = data.get('items', [])
 
-        if not product_id or not quantidade:
-            return make_response(jsonify({"erro": "Campos obrigatórios faltando"}), 400)
+        if not items:
+            return make_response(jsonify({"erro": "Nenhum item informado"}), 400)
 
         try:
-            sale = SaleService.create_sale(seller_id, product_id, quantidade)
+            order = SaleService.create_order(seller_id, items)
             return make_response(jsonify({
                 "mensagem": "Venda realizada com sucesso",
-                "venda": sale.to_dict()
+                "pedido": order.to_dict()
             }), 201)
         except ValueError as e:
             return make_response(jsonify({"erro": str(e)}), 400)
@@ -28,26 +27,10 @@ class SaleController:
 
     @staticmethod
     @jwt_required()
-    def list_sales():
+    def list_orders():
         seller_id = get_jwt_identity()
         try:
-            sales = SaleService.list_sales(seller_id)
-            return make_response(jsonify({
-                "vendas": [s.to_dict() for s in sales]
-            }), 200)
-        except Exception as e:
-            return make_response(jsonify({"erro": "Erro interno no servidor"}), 500)
-
-    @staticmethod
-    @jwt_required()
-    def get_sale(sale_id):
-        seller_id = get_jwt_identity()
-        try:
-            sale = SaleService.get_sale(sale_id, seller_id)
-            return make_response(jsonify({
-                "venda": sale.to_dict()
-            }), 200)
-        except ValueError as e:
-            return make_response(jsonify({"erro": str(e)}), 404)
+            orders = SaleService.list_orders(seller_id)
+            return make_response(jsonify({"pedidos": orders}), 200)
         except Exception as e:
             return make_response(jsonify({"erro": "Erro interno no servidor"}), 500)

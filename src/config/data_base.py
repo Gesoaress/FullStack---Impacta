@@ -18,5 +18,6 @@ def init_db(app):
     with app.app_context():
         from src.Infrastructure.Model.user import User
         from src.Infrastructure.Model.product import Product
+        from src.Infrastructure.Model.sale_order import SaleOrder
         from src.Infrastructure.Model.sale import Sale
         db.create_all()

@@ -10,6 +10,7 @@ class Product(db.Model):
     quantity = db.Column(db.Integer, nullable=False, default=0)
     status = db.Column(db.String(20), default="ACTIVE")
     img = db.Column(db.String(255), nullable=True)
+    categoria = db.Column(db.String(50), default="Outros")
 
     def to_dict(self):
         return {

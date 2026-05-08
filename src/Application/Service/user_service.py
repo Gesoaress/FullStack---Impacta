@@ -42,12 +42,9 @@ class UserService:
 
     @staticmethod
     def activate_user(phone, code):
-        user = User.query.filter_by(phone=phone).first()
+        user = User.query.filter_by(phone=phone, activation_code=code).first()
 
         if not user:
-            raise ValueError("Seller não encontrado")
-
-        if user.activation_code != code:
             raise ValueError("Código inválido")
 
         if user.status == "ACTIVE":

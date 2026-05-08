@@ -12,7 +12,8 @@ class User(db.Model):
     phone = db.Column(db.String(20), nullable=False)
     password = db.Column(db.String(256), nullable=False)
     status = db.Column(db.String(20), default="INACTIVE")
-    activation_code = db.Column(db.String(4), nullable=True)  # código de 4 dígitos
+    activation_code = db.Column(db.String(4), nullable=True)
+    role = db.Column(db.String(10), default="SELLER")
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
@@ -27,5 +28,6 @@ class User(db.Model):
             "cnpj": self.cnpj,
             "email": self.email,
             "phone": self.phone,
-            "status": self.status
+            "status": self.status,
+            "role": self.role
         }

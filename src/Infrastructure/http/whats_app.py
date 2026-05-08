@@ -16,7 +16,7 @@ def send_whatsapp_code(phone, code):
     client = Client(ACCOUNT_SID, AUTH_TOKEN)
     message = client.messages.create(
         body=f"Seu código de ativação é: {code}",
-        from_=WHATSAPP_NUMBER,
+        from_=f"whatsapp:{WHATSAPP_NUMBER}",
         to=f"whatsapp:{phone}"
     )
     return message.sid
