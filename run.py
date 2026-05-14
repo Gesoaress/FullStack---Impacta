@@ -2,17 +2,17 @@ from flask import Flask
 from flask_cors import CORS
 from src.config.data_base import init_db
 from src.routes import init_routes
+import os
 
 def create_app():
-    """
-    Função que cria e configura a aplicação Flask.
-    """
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder='static', static_url_path='/static')
 
     CORS(app)
 
-    init_db(app)
+    app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
+    app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB
 
+    init_db(app)
     init_routes(app)
 
     return app

@@ -4,6 +4,7 @@ from src.Application.Controllers.product_controller import ProductController
 from src.Application.Controllers.sale_controller import SaleController
 from src.Application.Controllers.dashboard_controller import DashboardController
 from src.Application.Controllers.admin_controller import AdminController
+from src.Application.Controllers.upload_controller import UploadController
 from flask import jsonify, make_response
 
 def init_routes(app):
@@ -80,6 +81,11 @@ def init_routes(app):
     @app.route('/api/dashboard', methods=['GET'])
     def get_dashboard():
         return DashboardController.get_dashboard()
+
+    # Upload
+    @app.route('/api/upload', methods=['POST'])
+    def upload_image():
+        return UploadController.upload_image()
 
     # Admin
     @app.route('/api/admin/register', methods=['POST'])
